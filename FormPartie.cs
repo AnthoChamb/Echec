@@ -20,18 +20,47 @@ namespace Echec {
             InitializeComponent();
             this.partie = partie;
             source = null;
+
+            // Ajoute l'event à nos cases de l'échiquier
+            foreach (Control ctrl in tableEchiquier.Controls)
+                ctrl.Click += case_Click;
         }
+
+        #region Méthodes publiques
 
         /// <summary>Mets à jour l'affichage de l'<see cref="Echiquier"/> dans le formulaire</summary>
         /// <param name="echiquier">Représentation en chaine de l'<see cref="Echiquier"/></param>
         public void AfficherEchiquier(string echiquier) {
-            throw new NotImplementedException();
+            byte ctrl = 0;
+            for (int piece = echiquier.Length - 1; piece >= 0; piece--)
+                tableEchiquier.Controls[ctrl++].Text = echiquier[piece].ToString();
         }
 
         /// <summary>Affiche le message précisé dans la zone de texte</summary>
         /// <param name="message">Message a afficher</param>
-        public void AfficherMessage(string message) {
-            throw new NotImplementedException();
+        public void AfficherMessage(string message) => labelMessage.Text = message;
+
+        #endregion
+
+        #region Gestionnaire d'événements
+
+        /// <summary>Gestionnaire d'événement d'un clic sur une case</summary>
+        /// <param name="sender">Objet à l'origine de l'événement</param>
+        /// <param name="e">Paramètres de l'événement</param>
+        private void case_Click(object sender, EventArgs e) {
+            TableLayoutPanelCellPosition clic = tableEchiquier.GetCellPosition(sender as Control);
+            if (source == null) {
+                if ((sender as Control).Text != " ") {
+                    source = clic;
+                    (sender as Control).ForeColor = Color.Blue;
+                }
+            } else {
+                tableEchiquier.GetControlFromPosition(source.Value.Column, source.Value.Row).ForeColor = SystemColors.ControlText;
+                partie.JouerCoup((byte)source.Value.Row, (byte)clic.Row, (byte)source.Value.Column, (byte)clic.Column);
+                source = null;
+            }
         }
+
+        #endregion
     }
 }

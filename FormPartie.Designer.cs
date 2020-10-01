@@ -1,4 +1,7 @@
-﻿namespace Echec {
+﻿using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+
+namespace Echec {
     partial class FormPartie {
         /// <summary>
         /// Variable nécessaire au concepteur.
@@ -1106,7 +1109,7 @@
             this.tableEchiquier.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 85F));
             this.tableEchiquier.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 90F));
             this.tableEchiquier.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 88F));
-            this.tableEchiquier.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 82F));
+            this.tableEchiquier.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 83F));
             this.tableEchiquier.Controls.Add(label64, 7, 7);
             this.tableEchiquier.Controls.Add(label63, 6, 7);
             this.tableEchiquier.Controls.Add(label62, 5, 7);
@@ -1185,26 +1188,25 @@
             this.tableEchiquier.Size = new System.Drawing.Size(686, 408);
             this.tableEchiquier.TabIndex = 1;
             // 
-            // FormEchec
+            // FormPartie
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(711, 450);
             this.Controls.Add(this.tableEchiquier);
             this.Controls.Add(this.labelMessage);
-            this.Name = "FormEchec";
+            this.Name = "FormPartie";
             this.Text = "Form1";
             this.tableEchiquier.ResumeLayout(false);
             this.tableEchiquier.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
 
         private System.Windows.Forms.Label labelMessage;
-        private System.Windows.Forms.TableLayoutPanel tableEchiquier;
+        private System.Windows.Forms.TableLayoutPanel tableEchiquier; 
     }
 }
 

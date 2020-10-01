@@ -9,7 +9,7 @@ namespace Echec {
     public class Partie {
         private readonly Dictionary<Couleur, Joueur> joueurs;
         private readonly Echec echec;
-        private readonly FormPartie formEchec;
+        private readonly FormPartie formPartie;
         private readonly Echiquier echiquier;
         private Couleur actif;
         private byte coups;
@@ -27,7 +27,8 @@ namespace Echec {
 
             this.echec = echec;
             echiquier = new Echiquier();
-            formEchec = new FormPartie(this);
+            formPartie = new FormPartie(this);
+            formPartie.AfficherEchiquier(echiquier.ToString());
 
             actif = Couleur.NOIR;
             coups = 0;
@@ -37,7 +38,7 @@ namespace Echec {
         }
 
         /// <summary>Affiche <see cref="FormPartie"/></summary>
-        public void Demarrer() => formEchec.ShowDialog();
+        public void Demarrer() => formPartie.ShowDialog();
 
         /// <summary>Joue le coup de la source à la destination, si possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
@@ -47,6 +48,7 @@ namespace Echec {
         public void JouerCoup(byte liSrc, byte liDest, byte colSrc, byte colDest) {
             if (CoupValide(liSrc, liDest, colSrc, colDest)) {
                 echiquier.JouerCoup(liSrc, liDest, colSrc, colDest);
+                formPartie.AfficherEchiquier(echiquier.ToString());
             }
         }
 
@@ -57,7 +59,7 @@ namespace Echec {
         /// <param name="colSrc">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le coup est possible</returns>
         private bool CoupValide(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            throw new NotImplementedException();
+            return true;
         }
 
         /// <summary>Évalue si le joueur actif est en échec</summary>

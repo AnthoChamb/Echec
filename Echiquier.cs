@@ -9,7 +9,32 @@ namespace Echec {
         public Echiquier() {
             plateau = new Piece[8, 8];
 
-            // TODO : Créer les pièces sur le plateau
+            // Initialisation des pièces noires...
+            plateau[0, 0] = new Tour(Couleur.NOIR);
+            plateau[0, 1] = new Cavalier(Couleur.NOIR);
+            plateau[0, 2] = new Fou(Couleur.NOIR);
+            plateau[0, 3] = new Reine(Couleur.NOIR);
+            plateau[0, 4] = new Roi(Couleur.NOIR);
+            plateau[0, 5] = new Fou(Couleur.NOIR);
+            plateau[0, 6] = new Cavalier(Couleur.NOIR);
+            plateau[0, 7] = new Tour(Couleur.NOIR);
+            for (int col = 0; col < 8; col++) plateau[1, col] = new Pion(Couleur.NOIR);
+
+            // Initialisation des cases vides...
+            for (int ligne = 2; ligne < 6; ligne++)
+                for (int col = 0; col < 8; col++)
+                    plateau[ligne, col] = null;
+
+            // Initialisation des pièce blanches...
+            for (int col = 0; col < 8; col++) plateau[6, col] = new Pion(Couleur.BLANC);
+            plateau[7, 0] = new Tour(Couleur.BLANC);
+            plateau[7, 1] = new Cavalier(Couleur.BLANC);
+            plateau[7, 2] = new Fou(Couleur.BLANC);
+            plateau[7, 3] = new Reine(Couleur.BLANC);
+            plateau[7, 4] = new Roi(Couleur.BLANC);
+            plateau[7, 5] = new Fou(Couleur.BLANC);
+            plateau[7, 6] = new Cavalier(Couleur.BLANC);
+            plateau[7, 7] = new Tour(Couleur.BLANC);
         }
 
         /// <summary>Évalue si la case de l'échiquier est vide</summary>
@@ -116,7 +141,11 @@ namespace Echec {
         /// <summary>Obtient une représentation en chaine de l'échiquier</summary>
         /// <returns>Retourne une représentation en chaine de l'échiquier</returns>
         public override string ToString() {
-            return base.ToString();
+            string echiquier = "";
+            foreach(Piece piece in plateau) {
+                echiquier += piece?.ToString() ?? " ";
+            }
+            return echiquier;
         }
     }
 }

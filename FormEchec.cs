@@ -21,7 +21,7 @@ namespace Echec {
                 lsvJoueurs.Items.Add(joueur);
         }
 
-        #region Événements
+        #region Gestionnaire d'événements
 
         /// <summary>Gestionnaire d'événement de la fermeture du formulaire</summary>
         /// <param name="sender">Objet à l'origine de de l'événement</param>

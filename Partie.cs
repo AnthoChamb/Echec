@@ -37,7 +37,7 @@ namespace Echec {
         }
 
         /// <summary>Affiche <see cref="FormPartie"/></summary>
-        public void Demarrer() => formEchec.Show();
+        public void Demarrer() => formEchec.ShowDialog();
 
         /// <summary>Joue le coup de la source à la destination, si possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>

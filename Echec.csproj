@@ -82,6 +82,9 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FormEchec.resx">
+      <DependentUpon>FormEchec.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormPartie.resx">
       <DependentUpon>FormPartie.cs</DependentUpon>
     </EmbeddedResource>

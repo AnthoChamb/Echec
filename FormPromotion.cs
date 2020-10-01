@@ -20,5 +20,13 @@ namespace Echec {
 
         /// <summary>Obtient le choix de promotion de l'utilisateur</summary>
         public string Promotion { get => promotion; }
+
+        private void btnChoix_Click(object sender, EventArgs e) {
+            if (sender is Button btn) {
+                promotion = btn.Text;
+                DialogResult = DialogResult.Yes;
+                Close();
+            }
+        }
     }
 }

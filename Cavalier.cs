@@ -14,8 +14,6 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement du cavalier est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"></see></remarks>
-        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            throw new NotImplementedException();
-        }
+        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) => (Math.Abs(liDest - liSrc) == 1 && Math.Abs(colDest - colSrc) == 2) || (Math.Abs(liDest - liSrc) == 2 && Math.Abs(colDest - colSrc) == 1);
     }
 }

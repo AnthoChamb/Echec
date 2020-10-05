@@ -2,7 +2,7 @@
 
 namespace Echec {
     /// <summary>Classe de la pièce du roi au jeu d'échec</summary>
-    public class Roi : Piece {
+    public class Roi : PieceInit {
         /// <summary>Crée une pièce de roi au jeu d'échec de la couleur spécifié</summary>
         /// <param name="couleur">Couleur de la pièce</param>
         public Roi(Couleur couleur) : base('\u2654', couleur, false) { }
@@ -14,8 +14,8 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement du roi est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"></see></remarks>
-        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            throw new NotImplementedException();
-        }
+        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest)=> Math.Abs(liDest - liSrc) <= 1 && Math.Abs(colDest - colSrc) <=1;
+          
+        
     }
 }

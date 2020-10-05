@@ -14,8 +14,6 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement de la reine est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"></see></remarks>
-        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            throw new NotImplementedException();
-        }
+        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) => Fou.SiDeplacerFou(liSrc, liDest, colSrc, colDest) || Tour.SiDeplacerTour(liSrc, liDest, colSrc, colDest);
     }
 }

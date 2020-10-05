@@ -2,7 +2,7 @@
 
 namespace Echec {
     /// <summary>Classe du pion au jeu d'échec</summary>
-    public class Pion : Piece {
+    public class Pion : PieceInit {
         /// <summary>Crée un pion au jeu d'échec de la couleur spécifié</summary>
         /// <param name="couleur">Couleur de la pièce</param>
         public Pion(Couleur couleur) : base('\u2659', couleur, false) { }
@@ -14,9 +14,7 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement du pion est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"></see></remarks>
-        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            throw new NotImplementedException();
-        }
+        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) => this.Init ? Math.Abs(liDest - liSrc) <= 2 : Math.Abs(liDest - liSrc) == 1;
 
         /// <summary>Évalue si le déplacement du pion de la source pour manger celle de la destination est possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>

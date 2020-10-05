@@ -9,7 +9,7 @@ namespace Echec {
         public Echiquier() {
             plateau = new Piece[8, 8];
 
-            // Initialisation des pièces noires...
+            // Initialisation des pièces noires
             plateau[0, 0] = new Tour(Couleur.NOIR);
             plateau[0, 1] = new Cavalier(Couleur.NOIR);
             plateau[0, 2] = new Fou(Couleur.NOIR);
@@ -20,12 +20,12 @@ namespace Echec {
             plateau[0, 7] = new Tour(Couleur.NOIR);
             for (int col = 0; col < 8; col++) plateau[1, col] = new Pion(Couleur.NOIR);
 
-            // Initialisation des cases vides...
+            // Initialisation des cases vides
             for (int ligne = 2; ligne < 6; ligne++)
                 for (int col = 0; col < 8; col++)
                     plateau[ligne, col] = null;
 
-            // Initialisation des pièce blanches...
+            // Initialisation des pièce blanches
             for (int col = 0; col < 8; col++) plateau[6, col] = new Pion(Couleur.BLANC);
             plateau[7, 0] = new Tour(Couleur.BLANC);
             plateau[7, 1] = new Cavalier(Couleur.BLANC);
@@ -90,7 +90,33 @@ namespace Echec {
         /// <param name="colSrc">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le chemin entre la source et la destination ne contient pas une pièce</returns>
         public bool CheminLibre(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            throw new NotImplementedException();
+            sbyte increment; // Définit l'incrémentation à partir de la source vers la destination
+            if (liSrc == liDest) {
+                // Déplacement horizontal
+                increment = (sbyte)(colSrc > colDest ? -1 : 1);
+                for (byte col = colSrc; col != colDest; col = (byte)(col + increment))
+                    if (plateau[liSrc, col] != null)
+                        return false;
+
+            } else if (colSrc == colDest) {
+                // Déplacement vertical
+                increment = (sbyte)(liSrc > liDest ? -1 : 1);
+                for (byte ligne = liSrc; ligne != liDest; ligne = (byte)(ligne + increment))
+                    if (plateau[ligne, colSrc] != null)
+                        return false;
+
+            } else {
+                // Déplacement diagonal
+                increment = (sbyte)(liSrc > liDest ? -1 : 1);
+                byte col = colSrc;
+                for (byte ligne = liSrc; ligne != liDest; ligne = (byte)(ligne + increment))
+                    if (plateau[ligne, col] != null)
+                        return false;
+                    else
+                        col = (byte)(col + increment);
+            }
+
+            return true;
         }
 
         /// <summary>Évalue si le roque est possible pour la couleur et la taille choisie</summary>
@@ -98,8 +124,16 @@ namespace Echec {
         /// <param name="grand">Taille du roque. true pour le grand roque, false pour le petit roque</param>
         /// <returns>Retourne true si le roque est possible</returns>
         public bool SiRoquable(Couleur couleur, bool grand) {
-            throw new NotImplementedException();
+            byte ligne = (byte)(couleur == Couleur.NOIR ? 0 : 7); // Ligne où est joué le roque selon la couleur
+            byte col = (byte)(grand ? 0 : 7); // Colonne de la tour où est joué le roque
+            return plateau[ligne, 4] is Roi roi && SiPieceRoquable(roi, couleur) && plateau[ligne, col] is Tour tour && SiPieceRoquable(tour, couleur) && CheminLibre(ligne, ligne, 4, col);
         }
+
+        /// <summary>Évalue si le roque est possible pour la pièce et la coleur choisie</summary>
+        /// <param name="piece">Pièce a évalué</param>
+        /// <param name="couleur">Couleur a évalué</param>
+        /// <returns></returns>
+        private bool SiPieceRoquable(PieceInit piece, Couleur couleur) => piece.Couleur == couleur && piece.Init;
 
         /// <summary>Joue le coup de la source à la destination</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
@@ -110,6 +144,9 @@ namespace Echec {
         public void JouerCoup(byte liSrc, byte liDest, byte colSrc, byte colDest) {
             plateau[liDest, colDest] = plateau[liSrc, colSrc];
             plateau[liSrc, colSrc] = null;
+
+            if (plateau[liDest, colDest] is PieceInit piece)
+                piece.Init = false;
         }
 
         /// <summary>Joue la prise en passant de la source à la destination</summary>
@@ -121,15 +158,16 @@ namespace Echec {
         public void JouerEnPassant(byte liSrc, byte liDest, byte colSrc, byte colDest) {
             JouerCoup(liSrc, liDest, colSrc, colDest);
             plateau[liDest + plateau[liDest, colDest].Couleur == Couleur.NOIR ? 1 : -1, colDest] = null;
-            Type.GetType("Piece");
         }
 
         /// <summary>Joue le roque pour la couleur et la taille choisie</summary>
         /// <param name="couleur">Couleur du roque a effectué</param>
         /// <param name="grand">Taille du roque. true pour le grand roque, false pour le petit roque</param>
-        /// /// <remarks>Cette méthode ne tient pas compte de si le roque est valide. Une vérification doit être effectuée avant</remarks>
+        /// <remarks>Cette méthode ne tient pas compte de si le roque est valide. Une vérification doit être effectuée avant</remarks>
         public void JouerRoque(Couleur couleur, bool grand) {
-            throw new NotImplementedException();
+            byte ligne = (byte)(couleur == Couleur.NOIR ? 0 : 7);
+            JouerCoup(ligne, ligne, 4, (byte)(grand ? 2 : 6)); // Déplacement du roi
+            JouerCoup(ligne, ligne, (byte)(grand ? 0 : 7), (byte)(grand ? 3 : 5)); // Déplacement de la tour
         }
 
         /// <summary>Effectue la promotion de la piece à la ligne et colonne précisée en le type choisi</summary>
@@ -142,9 +180,8 @@ namespace Echec {
         /// <returns>Retourne une représentation en chaine de l'échiquier</returns>
         public override string ToString() {
             string echiquier = "";
-            foreach(Piece piece in plateau) {
+            foreach(Piece piece in plateau)
                 echiquier += piece?.ToString() ?? " ";
-            }
             return echiquier;
         }
     }

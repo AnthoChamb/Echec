@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Echec {
     /// <summary>Classe d'une pièce d'échec mémorisant si elle a été déplacée de sa position initial. Cette clase ne peut pas être instanciée</summary>
@@ -16,7 +12,8 @@ namespace Echec {
         /// <exception cref="ArgumentOutOfRangeException">Le caractère unicode de la pièce doit se situer entre U+2654 et U+2659</exception>
         public PieceInit(char unicode, Couleur couleur, bool flottante) : base(unicode, couleur, flottante) => init = false;
 
-        /// <summary>Obtient et définit si la pièce a été déplacée de sa position initial</summary>
+        /// <summary>Obtient et définit si la pièce est à sa position initial</summary>
+        /// <returns>Retourne true si la pièce est à sa position initial et n'a pas bougée</returns>
         public bool Init { get => init; set => init = value; }
     }
 }

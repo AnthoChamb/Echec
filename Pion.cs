@@ -14,7 +14,8 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement du pion est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"></see></remarks>
-        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) => this.Init ? Math.Abs(liDest - liSrc) <= 2 : Math.Abs(liDest - liSrc) == 1;
+        public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) => Init ? Couleur == Couleur.BLANC ? liDest - liSrc == -1 || liDest - liSrc == -2 : liDest - liSrc == 1 || liDest - liSrc == 2 : Couleur == Couleur.BLANC ? liDest - liSrc == -1 : liDest - liSrc == 1;
+
 
         /// <summary>Évalue si le déplacement du pion de la source pour manger celle de la destination est possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
@@ -23,6 +24,7 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement du pion pour manger la destination est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"/></remarks>
-        public override bool SiManger(byte liSrc, byte liDest, byte colSrc, byte colDest) => SiDeplacer(liSrc, liDest, colSrc, colDest);
+        public override bool SiManger(byte liSrc, byte liDest, byte colSrc, byte colDest) => Couleur == Couleur.BLANC && Math.Abs(liDest - liSrc) == 1 ? colDest - colSrc == -1 : colDest - colSrc == 1;
+ 
     }
 }

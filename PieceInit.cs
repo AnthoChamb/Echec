@@ -10,7 +10,7 @@ namespace Echec {
         /// <param name="couleur">Couleur de la pièce</param>
         /// <param name="flottante">Définit si la pièce peut flotter par dessus les autres pièces lors des déplacements</param>
         /// <exception cref="ArgumentOutOfRangeException">Le caractère unicode de la pièce doit se situer entre U+2654 et U+2659</exception>
-        public PieceInit(char unicode, Couleur couleur, bool flottante) : base(unicode, couleur, flottante) => init = false;
+        public PieceInit(char unicode, Couleur couleur, bool flottante) : base(unicode, couleur, flottante) => init = true;
 
         /// <summary>Obtient et définit si la pièce est à sa position initial</summary>
         /// <returns>Retourne true si la pièce est à sa position initial et n'a pas bougée</returns>

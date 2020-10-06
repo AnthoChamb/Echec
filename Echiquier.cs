@@ -94,14 +94,14 @@ namespace Echec {
             if (liSrc == liDest) {
                 // Déplacement horizontal
                 increment = (sbyte)(colSrc > colDest ? -1 : 1);
-                for (byte col = colSrc; col != colDest; col = (byte)(col + increment))
+                for (byte col = (byte)(colSrc + increment); col != colDest; col = (byte)(col + increment))
                     if (plateau[liSrc, col] != null)
                         return false;
 
             } else if (colSrc == colDest) {
                 // Déplacement vertical
                 increment = (sbyte)(liSrc > liDest ? -1 : 1);
-                for (byte ligne = liSrc; ligne != liDest; ligne = (byte)(ligne + increment))
+                for (byte ligne = (byte)(liSrc + increment); ligne != liDest; ligne = (byte)(ligne + increment))
                     if (plateau[ligne, colSrc] != null)
                         return false;
 
@@ -109,7 +109,7 @@ namespace Echec {
                 // Déplacement diagonal
                 increment = (sbyte)(liSrc > liDest ? -1 : 1);
                 byte col = colSrc;
-                for (byte ligne = liSrc; ligne != liDest; ligne = (byte)(ligne + increment))
+                for (byte ligne = (byte)(liSrc + increment); ligne != liDest; ligne = (byte)(ligne + increment))
                     if (plateau[ligne, col] != null)
                         return false;
                     else
@@ -157,7 +157,7 @@ namespace Echec {
         /// <remarks>Cette méthode ne tient pas compte de si le coup est valide. Une vérification doit être effectuée avant</remarks>
         public void JouerEnPassant(byte liSrc, byte liDest, byte colSrc, byte colDest) {
             JouerCoup(liSrc, liDest, colSrc, colDest);
-            plateau[liDest + plateau[liDest, colDest].Couleur == Couleur.NOIR ? 1 : -1, colDest] = null;
+            plateau[liDest + (plateau[liDest, colDest].Couleur == Couleur.BLANC ? 1 : -1), colDest] = null;
         }
 
         /// <summary>Joue le roque pour la couleur et la taille choisie</summary>

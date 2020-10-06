@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Echec {
     /// <summary>Classe d'une partie du jeu d'échec</summary>
@@ -46,10 +44,41 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne source</param>
         /// <param name="colSrc">Indice de la colonne de destination</param>
         public void JouerCoup(byte liSrc, byte liDest, byte colSrc, byte colDest) {
+            // Coup normal
             if (CoupValide(liSrc, liDest, colSrc, colDest)) {
                 echiquier.JouerCoup(liSrc, liDest, colSrc, colDest);
-                formPartie.AfficherEchiquier(echiquier.ToString());
+                ApresCoup(liDest, colDest);
+
+            // Roque
+            } else if (liSrc == liDest && liSrc == (actif == Couleur.NOIR ? 0 : 7) && (colDest == 2 && echiquier.SiRoquable(actif, true) || colDest == 6 && echiquier.SiRoquable(actif, false))) {
+                echiquier.JouerRoque(actif, colDest == 2);
+                ApresCoup(liDest, colDest);
+
+            // Manger en passant
+            } else if (echiquier.EstPion(liSrc, colSrc) && echiquier.SiManger(liSrc, liDest, colSrc, colDest) && posistions.Last()[(liDest + (actif == Couleur.BLANC ? -1 : 1)) * 7 + colDest] != ' ' && echiquier.EstPion((byte)(liDest + (actif == Couleur.BLANC ? 1 : -1)), colDest)) {
+                echiquier.JouerEnPassant(liSrc, liDest, colSrc, colDest);
+                ApresCoup(liDest, colDest);
             }
+        }
+
+        /// <summary>Gère les action nécessaire après un coup</summary>
+        /// <param name="liDest">Indice de la ligne de destination</param>
+        /// <param name="colDest">Indice de la colonne de destination</param>
+        private void ApresCoup(byte liDest, byte colDest) {
+            string chaine = echiquier.ToString(); // Représentation en chaine de l'échiquier
+            formPartie.AfficherEchiquier(echiquier.ToString());
+
+            actif = (Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif); // Truc de Patrick pour inverser
+            formPartie.AfficherMessage("C'est à " + joueurs[actif].Nom + " de jouer");
+
+            // Règle des 50 coups
+            if (echiquier.EstPion(liDest, colDest) || posistions.Last()[liDest * 7 + colDest] == ' ')
+                coups = 0;
+            else if (++coups == 50) {
+                // TODO: Partie nulle
+            }
+            
+            posistions.Add(chaine);
         }
 
         /// <summary>Évalue si il est possible de jouer le coup de la source à la destination</summary>
@@ -59,6 +88,34 @@ namespace Echec {
         /// <param name="colSrc">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le coup est possible</returns>
         private bool CoupValide(byte liSrc, byte liDest, byte colSrc, byte colDest) {
+            if (echiquier.EstVide(liSrc, colSrc)) {
+                formPartie.AfficherMessage("Coup invalide. Veuillez sélectioner une pièce source");
+                return false;
+            } 
+
+            if (echiquier.CouleurPiece(liSrc, colSrc) != actif) {
+                formPartie.AfficherMessage("Coup invalide. La pièce source ne vous appartient pas");
+                return false;
+            }
+
+            if (!echiquier.EstVide(liDest, colDest)) {
+                if (echiquier.CouleurPiece(liDest, colDest) == actif) {
+                    formPartie.AfficherMessage("Coup invalide. Impossible de manger sa propre pièce");
+                    return false;
+                } else if (!echiquier.SiManger(liSrc ,liDest, colSrc, colDest)) {
+                    formPartie.AfficherMessage("Coup invalide. Cette pièce ne peut effectuer ce déplacement");
+                    return false;
+                }
+            } else if (!echiquier.SiDeplacer(liSrc, liDest, colSrc, colDest)) {
+                formPartie.AfficherMessage("Coup invalide. Cette pièce ne peut effectuer ce déplacement");
+                return false;
+            }
+
+            if (!echiquier.EstFlottante(liSrc, colSrc) && !echiquier.CheminLibre(liSrc, liDest, colSrc, colDest)) {
+                formPartie.AfficherMessage("Coup invalide. Une pièce se trouve dans le chemin de la pièce");
+                return false;
+            }
+
             return true;
         }
 

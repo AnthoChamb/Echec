@@ -41,8 +41,22 @@ namespace Echec {
         public void Demarrer() => formPartie.ShowDialog();
 
         /// <summary>Capitulation du joueur actif</summary>
-        public void Capituler() {
-            // TODO: Défaite du joueur actif
+        public void Capituler() => Victoire((Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif));
+
+        /// <summary>Effectue la fin de la parite par la victoire d'un joueur</summary>
+        /// <param name="vainqueur">Couleur du joueur vainqueur</param>
+        private void Victoire(Couleur vainqueur) {
+            foreach (Joueur joueur in joueurs.Values)
+                joueur.Jouees++;
+
+            joueurs[vainqueur].Victoires++;
+
+            // Ajuster pointage
+            Couleur perdant = (Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)vainqueur);
+            joueurs[vainqueur].Pointage = joueurs[vainqueur] + joueurs[perdant];
+            joueurs[perdant].Pointage = joueurs[perdant] - joueurs[vainqueur];
+
+            formPartie.Close();
         }
 
         #endregion

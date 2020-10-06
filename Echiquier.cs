@@ -184,5 +184,19 @@ namespace Echec {
                 echiquier += piece?.ToString() ?? " ";
             return echiquier;
         }
+        /// <summary>Obtient la position  du roi en x et en y </summary>
+        /// <param name="couleur">Couleur active</param>
+        /// <returns>Retourne la postion en x et en y du roi</returns>
+        public (byte y, byte x) PositionRoi(Couleur couleur) {
+            for (byte i = 0; i < 8; i++) {
+                for (byte j = 0; j < 8; j++) {
+                    if (EstRoi(i, j) && CouleurPiece(i, j) == couleur) {
+                        return (i, j);
+                    }
+                }
+            }
+            return (0, 0);
+        } 
+ 
     }
 }

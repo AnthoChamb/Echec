@@ -151,14 +151,35 @@ namespace Echec {
         /// <summary>Évalue si le joueur actif est en échec</summary>
         /// <returns>Retourne true si le joueur actif est en échec</returns>
         private bool Echec() {
-            throw new NotImplementedException();
+        
+
+            for (byte i = 0; i < 8; i++) {
+                for (byte j = 0; j < 8; j++) {
+                    if (!echiquier.EstRoi(i, j) && !echiquier.EstVide(i, j) && echiquier.CouleurPiece(i,j) != actif && (echiquier.CheminLibre(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x) || echiquier.EstFlottante(i,j)) && echiquier.SiManger(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x))
+                        return true;
+                }
+            }
+            return false;
         }
 
         /// <summary>Évalue si le joueur actif est matté</summary>
         /// <returns>Retourne true si le joueur actif est matté</returns>
         private bool Mat() {
-            throw new NotImplementedException();
-        }
+           byte iY = echiquier.PositionRoi(actif).y;
+           byte iX = echiquier.PositionRoi(actif).x;
+
+
+            return Echec() && !(echiquier.SiDeplacer(iX, ++iX, iY, iY)
+                           && echiquier.SiDeplacer(iX, --iX, iY, iY)
+                           && echiquier.SiDeplacer(iX, iX, iY, ++iY)
+                           && echiquier.SiDeplacer(iX, iX, iY, --iY)
+                           && echiquier.SiDeplacer(iX, ++iX, iY, ++iY)
+                           && echiquier.SiDeplacer(iX, --iX, iY, --iY)
+                           && echiquier.SiDeplacer(iX, --iX, iY, ++iY)
+                           && echiquier.SiDeplacer(iX, --iX, iY, --iY));
+
+
+        } 
 
         /// <summary>Évalue si le joueur actif est en situation de pat</summary>
         /// <returns>Retourne true si le joueur actif est en situation de pat</returns>

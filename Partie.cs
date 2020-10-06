@@ -35,8 +35,19 @@ namespace Echec {
             };
         }
 
+        #region Déroulement de la parie
+
         /// <summary>Affiche <see cref="FormPartie"/></summary>
         public void Demarrer() => formPartie.ShowDialog();
+
+        /// <summary>Capitulation du joueur actif</summary>
+        public void Capituler() {
+            // TODO: Défaite du joueur actif
+        }
+
+        #endregion
+
+        #region Déroulement d'un coup
 
         /// <summary>Joue le coup de la source à la destination, si possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
@@ -119,6 +130,10 @@ namespace Echec {
             return true;
         }
 
+        #endregion
+
+        #region Vérification d'échec
+
         /// <summary>Évalue si le joueur actif est en échec</summary>
         /// <returns>Retourne true si le joueur actif est en échec</returns>
         private bool Echec() {
@@ -136,5 +151,7 @@ namespace Echec {
         private bool Pat() {
             throw new NotImplementedException();
         }
+
+        #endregion
     }
 }

@@ -61,6 +61,16 @@ namespace Echec {
             }
         }
 
+        /// <summary>Gestionnaire d'événement d'un clic sur le boutton Capituler</summary>
+        /// <param name="sender">Objet à l'origine de l'événement</param>
+        /// <param name="e">Paramètres de l'événement</param>
+        private void btnCapituler_Click(object sender, EventArgs e) {
+            if (MessageBox.Show("Souhaitez-vous vraiment capituler et mettre fin à la partie?", "Capitulation", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) {
+                partie.Capituler();
+                Close();
+            }
+        }
+
         #endregion
     }
 }

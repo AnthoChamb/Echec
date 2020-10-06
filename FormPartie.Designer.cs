@@ -92,6 +92,7 @@ namespace Echec {
             System.Windows.Forms.Label label64;
             this.labelMessage = new System.Windows.Forms.Label();
             this.tableEchiquier = new System.Windows.Forms.TableLayoutPanel();
+            this.btnCapituler = new System.Windows.Forms.Button();
             label1 = new System.Windows.Forms.Label();
             label2 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
@@ -1174,7 +1175,7 @@ namespace Echec {
             this.tableEchiquier.Controls.Add(label3, 2, 0);
             this.tableEchiquier.Controls.Add(label2, 1, 0);
             this.tableEchiquier.Controls.Add(label1, 0, 0);
-            this.tableEchiquier.Location = new System.Drawing.Point(13, 30);
+            this.tableEchiquier.Location = new System.Drawing.Point(13, 47);
             this.tableEchiquier.Name = "tableEchiquier";
             this.tableEchiquier.RowCount = 8;
             this.tableEchiquier.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 48.07692F));
@@ -1188,25 +1189,39 @@ namespace Echec {
             this.tableEchiquier.Size = new System.Drawing.Size(686, 408);
             this.tableEchiquier.TabIndex = 1;
             // 
+            // btnCapituler
+            // 
+            this.btnCapituler.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnCapituler.Location = new System.Drawing.Point(608, 13);
+            this.btnCapituler.Name = "btnCapituler";
+            this.btnCapituler.Size = new System.Drawing.Size(90, 23);
+            this.btnCapituler.TabIndex = 2;
+            this.btnCapituler.Text = "Capituler";
+            this.btnCapituler.UseVisualStyleBackColor = true;
+            this.btnCapituler.Click += new System.EventHandler(this.btnCapituler_Click);
+            // 
             // FormPartie
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(711, 450);
+            this.ClientSize = new System.Drawing.Size(711, 467);
+            this.Controls.Add(this.btnCapituler);
             this.Controls.Add(this.tableEchiquier);
             this.Controls.Add(this.labelMessage);
             this.Name = "FormPartie";
-            this.Text = "Form1";
+            this.Text = "Partie";
             this.tableEchiquier.ResumeLayout(false);
             this.tableEchiquier.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
 
         private System.Windows.Forms.Label labelMessage;
-        private System.Windows.Forms.TableLayoutPanel tableEchiquier; 
+        private System.Windows.Forms.TableLayoutPanel tableEchiquier;
+        private Button btnCapituler;
     }
 }
 

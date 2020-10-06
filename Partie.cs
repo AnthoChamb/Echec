@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 
 namespace Echec {
     /// <summary>Classe d'une partie du jeu d'échec</summary>
@@ -51,8 +52,13 @@ namespace Echec {
 
             joueurs[vainqueur].Victoires++;
 
-            // Ajuster pointage
             Couleur perdant = (Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)vainqueur);
+
+            FormPartie.AfficherBoiteDialogue("Victoire de " + joueurs[vainqueur].Nom + "\n"
+                + joueurs[vainqueur] + " -> " + (joueurs[vainqueur] + joueurs[perdant]) + "\n"
+                + joueurs[perdant] + " -> " + (joueurs[perdant] - joueurs[vainqueur]) + "\nRetour au menu principal.", "Victoire");
+
+            // Ajuster pointage
             joueurs[vainqueur].Pointage = joueurs[vainqueur] + joueurs[perdant];
             joueurs[perdant].Pointage = joueurs[perdant] - joueurs[vainqueur];
 
@@ -72,6 +78,14 @@ namespace Echec {
             // Coup normal
             if (CoupValide(liSrc, liDest, colSrc, colDest)) {
                 echiquier.JouerCoup(liSrc, liDest, colSrc, colDest);
+
+                // Promotion d'un pion
+                if (echiquier.EstPion(liDest, colDest) && liDest == (actif == Couleur.BLANC ? 0 : 7)) {
+                    FormPromotion promotion = new FormPromotion();
+                    if (promotion.ShowDialog() == DialogResult.Yes)
+                        echiquier.Promotion(liDest, colDest, promotion.Promotion);
+                }
+
                 ApresCoup(liDest, colDest);
 
             // Roque
@@ -80,7 +94,7 @@ namespace Echec {
                 ApresCoup(liDest, colDest);
 
             // Manger en passant
-            } else if (echiquier.EstPion(liSrc, colSrc) && echiquier.SiManger(liSrc, liDest, colSrc, colDest) && posistions.Last()[(liDest + (actif == Couleur.BLANC ? -1 : 1)) * 7 + colDest] != ' ' && echiquier.EstPion((byte)(liDest + (actif == Couleur.BLANC ? 1 : -1)), colDest)) {
+            } else if (echiquier.EstPion(liSrc, colSrc) && echiquier.SiManger(liSrc, liDest, colSrc, colDest) && posistions.Last()[(liDest + (actif == Couleur.BLANC ? -1 : 1)) * 8 + colDest] != ' ' && echiquier.EstPion((byte)(liDest + (actif == Couleur.BLANC ? 1 : -1)), colDest)) {
                 echiquier.JouerEnPassant(liSrc, liDest, colSrc, colDest);
                 ApresCoup(liDest, colDest);
             }
@@ -97,13 +111,20 @@ namespace Echec {
             formPartie.AfficherMessage("C'est à " + joueurs[actif].Nom + " de jouer");
 
             // Règle des 50 coups
-            if (echiquier.EstPion(liDest, colDest) || posistions.Last()[liDest * 7 + colDest] == ' ')
+            if (echiquier.EstPion(liDest, colDest) || posistions[posistions.Count - 1][liDest * 8 + colDest] != ' ')
                 coups = 0;
             else if (++coups == 50) {
-                // TODO: Partie nulle
+                FormPartie.AfficherBoiteDialogue("Partie nulle car les 50 derniers coups consécutifs ont été joués par chacun des joueurs sans le mouvement d'aucun pion et sans aucune prise de pièce. Retour au menu principal.", "Partie nulle");
+                formPartie.Close();
             }
             
             posistions.Add(chaine);
+
+            // Troisième répétition d'une même position
+            if (posistions.GroupBy(position => position).Where(group => group.Count() == 3).Count() > 0) {
+                FormPartie.AfficherBoiteDialogue("Partie nulle car la même position a été répétée trois fois. Retour au menu principal.", "Partie nulle");
+                formPartie.Close();
+            }
         }
 
         /// <summary>Évalue si il est possible de jouer le coup de la source à la destination</summary>
@@ -151,11 +172,11 @@ namespace Echec {
         /// <summary>Évalue si le joueur actif est en échec</summary>
         /// <returns>Retourne true si le joueur actif est en échec</returns>
         private bool Echec() {
-        
+
 
             for (byte i = 0; i < 8; i++) {
                 for (byte j = 0; j < 8; j++) {
-                    if (!echiquier.EstRoi(i, j) && !echiquier.EstVide(i, j) && echiquier.CouleurPiece(i,j) != actif && (echiquier.CheminLibre(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x) || echiquier.EstFlottante(i,j)) && echiquier.SiManger(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x))
+                    if (!echiquier.EstRoi(i, j) && !echiquier.EstVide(i, j) && echiquier.CouleurPiece(i, j) != actif && (echiquier.CheminLibre(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x) || echiquier.EstFlottante(i, j)) && echiquier.SiManger(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x))
                         return true;
                 }
             }
@@ -165,8 +186,8 @@ namespace Echec {
         /// <summary>Évalue si le joueur actif est matté</summary>
         /// <returns>Retourne true si le joueur actif est matté</returns>
         private bool Mat() {
-           byte iY = echiquier.PositionRoi(actif).y;
-           byte iX = echiquier.PositionRoi(actif).x;
+            byte iY = echiquier.PositionRoi(actif).y;
+            byte iX = echiquier.PositionRoi(actif).x;
 
 
             return Echec() && !(echiquier.SiDeplacer(iX, ++iX, iY, iY)

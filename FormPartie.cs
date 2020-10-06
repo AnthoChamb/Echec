@@ -40,6 +40,15 @@ namespace Echec {
         /// <param name="message">Message a afficher</param>
         public void AfficherMessage(string message) => labelMessage.Text = message;
 
+        /// <summary>Affiche une boîte de dialogue aux utilisateurs</summary>
+        /// <param name="message">Message de la boîte de dialogue</param>
+        /// <param name="titre">Titre de la boîte de dialogue</param>
+        /// <param name="bouttons">Bouttons de la boîte de dialogue</param>
+        /// <param name="icone">Icone de le boîte de dialogue</param>
+        /// <returns>Retourne la réponse du dialogue</returns>
+        /// <remarks>Il est important de délégué à la vue l'appel de boîtes de dialogue afin de respecter le modèle MVC</remarks>
+        public static DialogResult AfficherBoiteDialogue(string message, string titre, MessageBoxButtons bouttons = MessageBoxButtons.OK, MessageBoxIcon icone = MessageBoxIcon.Information) => MessageBox.Show(message, titre, bouttons, icone);
+
         #endregion
 
         #region Gestionnaire d'événements

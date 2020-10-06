@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 
 namespace Echec {
     /// <summary>Classe du plateau d'échec (échiquier)</summary>
@@ -18,15 +19,15 @@ namespace Echec {
             plateau[0, 5] = new Fou(Couleur.NOIR);
             plateau[0, 6] = new Cavalier(Couleur.NOIR);
             plateau[0, 7] = new Tour(Couleur.NOIR);
-            for (int col = 0; col < 8; col++) plateau[1, col] = new Pion(Couleur.NOIR);
+            for (byte col = 0; col < 8; col++) plateau[1, col] = new Pion(Couleur.NOIR);
 
             // Initialisation des cases vides
-            for (int ligne = 2; ligne < 6; ligne++)
-                for (int col = 0; col < 8; col++)
+            for (byte ligne = 2; ligne < 6; ligne++)
+                for (byte col = 0; col < 8; col++)
                     plateau[ligne, col] = null;
 
             // Initialisation des pièce blanches
-            for (int col = 0; col < 8; col++) plateau[6, col] = new Pion(Couleur.BLANC);
+            for (byte col = 0; col < 8; col++) plateau[6, col] = new Pion(Couleur.BLANC);
             plateau[7, 0] = new Tour(Couleur.BLANC);
             plateau[7, 1] = new Cavalier(Couleur.BLANC);
             plateau[7, 2] = new Fou(Couleur.BLANC);
@@ -90,30 +91,30 @@ namespace Echec {
         /// <param name="colSrc">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le chemin entre la source et la destination ne contient pas une pièce</returns>
         public bool CheminLibre(byte liSrc, byte liDest, byte colSrc, byte colDest) {
-            sbyte increment; // Définit l'incrémentation à partir de la source vers la destination
             if (liSrc == liDest) {
                 // Déplacement horizontal
-                increment = (sbyte)(colSrc > colDest ? -1 : 1);
+                sbyte increment = (sbyte)(colSrc > colDest ? -1 : 1);
                 for (byte col = (byte)(colSrc + increment); col != colDest; col = (byte)(col + increment))
                     if (plateau[liSrc, col] != null)
                         return false;
 
             } else if (colSrc == colDest) {
                 // Déplacement vertical
-                increment = (sbyte)(liSrc > liDest ? -1 : 1);
+                sbyte increment = (sbyte)(liSrc > liDest ? -1 : 1);
                 for (byte ligne = (byte)(liSrc + increment); ligne != liDest; ligne = (byte)(ligne + increment))
                     if (plateau[ligne, colSrc] != null)
                         return false;
 
             } else {
                 // Déplacement diagonal
-                increment = (sbyte)(liSrc > liDest ? -1 : 1);
-                byte col = colSrc;
-                for (byte ligne = (byte)(liSrc + increment); ligne != liDest; ligne = (byte)(ligne + increment))
+                sbyte incrementLi = (sbyte)(liSrc > liDest ? -1 : 1);
+                sbyte incrementCol = (sbyte)(colSrc > colDest ? -1 : 1);
+                byte col = (byte)(colSrc + incrementCol);
+                for (byte ligne = (byte)(liSrc + incrementLi); ligne != liDest; ligne = (byte)(ligne + incrementLi))
                     if (plateau[ligne, col] != null)
                         return false;
                     else
-                        col = (byte)(col + increment);
+                        col = (byte)(col + incrementCol);
             }
 
             return true;
@@ -174,16 +175,17 @@ namespace Echec {
         /// <param name="ligne">Indice de la ligne</param>
         /// <param name="col">Indice de la colonne</param>
         /// <param name="promotion">Type de la promotion en chaine</param>
-        public void Promotion(byte ligne, byte col, string promotion) => plateau[ligne, col] = (Piece)Type.GetType(promotion).GetConstructors()[0].Invoke(new object[] { plateau[ligne, col].Couleur });
+        public void Promotion(byte ligne, byte col, string promotion) => plateau[ligne, col] = (Piece)Type.GetType("Echec." + promotion).GetConstructors()[0].Invoke(new object[] { plateau[ligne, col].Couleur });
 
         /// <summary>Obtient une représentation en chaine de l'échiquier</summary>
         /// <returns>Retourne une représentation en chaine de l'échiquier</returns>
         public override string ToString() {
             string echiquier = "";
-            foreach(Piece piece in plateau)
+            foreach (Piece piece in plateau)
                 echiquier += piece?.ToString() ?? " ";
             return echiquier;
         }
+
         /// <summary>Obtient la position  du roi en x et en y </summary>
         /// <param name="couleur">Couleur active</param>
         /// <returns>Retourne la postion en x et en y du roi</returns>
@@ -197,6 +199,5 @@ namespace Echec {
             }
             return (0, 0);
         } 
- 
     }
 }

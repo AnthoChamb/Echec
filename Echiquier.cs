@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace Echec {
     /// <summary>Classe du plateau d'échec (échiquier)</summary>
-    public class Echiquier {
+    public class Echiquier : ICloneable {
         private readonly Piece[,] plateau;
 
         /// <summary>Crée un nouveau échiquier avec toutes les pièces à leur position initial</summary>
@@ -198,6 +198,18 @@ namespace Echec {
                 }
             }
             return (0, 0);
-        } 
+        }
+
+        /// <summary>Crée une copie de l'instance actuelle</summary>
+        /// <returns>Retourne un nouveau objet qui est une copie de l'instance actuelle</returns>
+        public object Clone() {
+            Echiquier clone = new Echiquier();
+
+            for (int ligne = 0; ligne < plateau.GetLength(0); ligne++)
+                for (int col = 0; col < plateau.GetLength(1); col++)
+                    clone.plateau[ligne, col] = plateau[ligne, col];
+
+            return clone;
+        }
     }
 }

@@ -90,13 +90,27 @@ namespace Echec {
 
             // Roque
             } else if (liSrc == liDest && liSrc == (actif == Couleur.NOIR ? 0 : 7) && (colDest == 2 && echiquier.SiRoquable(actif, true) || colDest == 6 && echiquier.SiRoquable(actif, false))) {
-                echiquier.JouerRoque(actif, colDest == 2);
-                ApresCoup(liDest, colDest);
+                Echiquier clone = (Echiquier)echiquier.Clone();
+                clone.JouerRoque(actif, colDest == 2);
+
+                if (Menaces(clone.PositionRoi(actif), clone).Count > 0)
+                    formPartie.AfficherMessage("Coup illégal. Votre roi se retrouverait en échec");
+                else {
+                    echiquier.JouerRoque(actif, colDest == 2);
+                    ApresCoup(liDest, colDest);
+                }
 
             // Manger en passant
             } else if (echiquier.EstPion(liSrc, colSrc) && echiquier.SiManger(liSrc, liDest, colSrc, colDest) && posistions.Last()[(liDest + (actif == Couleur.BLANC ? -1 : 1)) * 8 + colDest] != ' ' && echiquier.EstPion((byte)(liDest + (actif == Couleur.BLANC ? 1 : -1)), colDest)) {
-                echiquier.JouerEnPassant(liSrc, liDest, colSrc, colDest);
-                ApresCoup(liDest, colDest);
+                Echiquier clone = (Echiquier)echiquier.Clone();
+                clone.JouerEnPassant(liSrc, liDest, colSrc, colDest);
+
+                if (Menaces(clone.PositionRoi(actif), clone).Count > 0)
+                    formPartie.AfficherMessage("Coup illégal. Votre roi se retrouverait en échec");
+                else {
+                    echiquier.JouerEnPassant(liSrc, liDest, colSrc, colDest);
+                    ApresCoup(liDest, colDest);
+                }
             }
         }
 
@@ -125,6 +139,11 @@ namespace Echec {
                 FormPartie.AfficherBoiteDialogue("Partie nulle car la même position a été répétée trois fois. Retour au menu principal.", "Partie nulle");
                 formPartie.Close();
             }
+
+            // Échec et mat
+            List<(byte, byte)> menaces = Menaces(echiquier.PositionRoi(actif), echiquier);
+            if (Mat(menaces))
+                Victoire((Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif));
         }
 
         /// <summary>Évalue si il est possible de jouer le coup de la source à la destination</summary>
@@ -162,50 +181,132 @@ namespace Echec {
                 return false;
             }
 
+            Echiquier clone = (Echiquier)echiquier.Clone();
+            clone.JouerCoup(liSrc, liDest, colSrc, colDest);
+
+            if (Menaces(clone.PositionRoi(actif), clone).Count > 0) {
+                formPartie.AfficherMessage("Coup illégal. Votre roi se retrouverait en échec");
+                return false;
+            }
+
             return true;
         }
 
         #endregion
 
-        #region Vérification d'échec
+        #region Vérifications d'échec
 
         /// <summary>Évalue si le joueur actif est en échec</summary>
-        /// <returns>Retourne true si le joueur actif est en échec</returns>
-        private bool Echec() {
+        private bool Echec { get => Menaces(echiquier.PositionRoi(actif), echiquier).Count > 0; }
 
+        /// <summary>Obtient une liste des pièces menaçant le roi du joueur actif se situant à l'emplacement précisé</summary>
+        /// <param name="roi">Couple de valeur indiquant l'emplacement du roi</param>
+        /// <param name="echiq"><see cref="Echiquier"/> à évalué</param>
+        /// <returns>Retourne une liste des pièces menaçcant le roi se situant èa l'emplacement précisé</returns>
+        private List<(byte ligne, byte col)> Menaces((byte ligne, byte col) roi, Echiquier echiq) {
+            List<(byte ligne, byte col)> menaces = new List<(byte ligne, byte col)>(); 
 
-            for (byte i = 0; i < 8; i++) {
-                for (byte j = 0; j < 8; j++) {
-                    if (!echiquier.EstRoi(i, j) && !echiquier.EstVide(i, j) && echiquier.CouleurPiece(i, j) != actif && (echiquier.CheminLibre(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x) || echiquier.EstFlottante(i, j)) && echiquier.SiManger(i, echiquier.PositionRoi(actif).y, j, echiquier.PositionRoi(actif).x))
-                        return true;
-                }
-            }
-            return false;
+            for (byte ligne = 0; ligne < 8; ligne++)
+                for (byte col = 0; col < 8; col++)
+                    if (!echiq.EstRoi(ligne, col) && !echiq.EstVide(ligne, col) && echiq.CouleurPiece(ligne, col) != actif && echiq.SiManger(ligne, roi.ligne, col, roi.col) && (echiq.EstFlottante(ligne, col) || echiq.CheminLibre(ligne, roi.ligne, col, roi.col)))
+                        menaces.Add((ligne, col));
+
+            return menaces;
         }
 
         /// <summary>Évalue si le joueur actif est matté</summary>
+        /// <param name="menaces">Liste des pièces menaçant le roi du joueur actif</param>
         /// <returns>Retourne true si le joueur actif est matté</returns>
-        private bool Mat() {
-            byte iY = echiquier.PositionRoi(actif).y;
-            byte iX = echiquier.PositionRoi(actif).x;
+        private bool Mat(List<(byte ligne, byte col)> menaces) {
+            (byte ligne, byte col) roi = echiquier.PositionRoi(actif);
+            
+            if (menaces.Count == 1) {
+                // Tente de capturer la pièce menaçante
+                for (byte ligne = 0; ligne < 8; ligne++)
+                    for (byte col = 0; col < 8; col++)
+                        if (PossedePiece(ligne, col) && echiquier.SiManger(ligne, menaces[0].ligne, col, menaces[0].col) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, menaces[0].ligne, col, menaces[0].col)))
+                            return false;
 
+                // Tente d'interposer une pièce entre le roi et la pièce menaçante
+                if (!echiquier.EstFlottante(menaces[0].ligne, menaces[0].col)) {
+                    if (menaces[0].ligne == roi.ligne) {
+                        // Déplacement horizontal
+                        sbyte increment = (sbyte)(menaces[0].col > roi.col ? -1 : 1);
+                        for (byte col = (byte)(menaces[0].col + increment); col != roi.col; col = (byte)(col + increment))
+                            if (Interposer(menaces[0].ligne, col))
+                                return false;
 
-            return Echec() && !(echiquier.SiDeplacer(iX, ++iX, iY, iY)
-                           && echiquier.SiDeplacer(iX, --iX, iY, iY)
-                           && echiquier.SiDeplacer(iX, iX, iY, ++iY)
-                           && echiquier.SiDeplacer(iX, iX, iY, --iY)
-                           && echiquier.SiDeplacer(iX, ++iX, iY, ++iY)
-                           && echiquier.SiDeplacer(iX, --iX, iY, --iY)
-                           && echiquier.SiDeplacer(iX, --iX, iY, ++iY)
-                           && echiquier.SiDeplacer(iX, --iX, iY, --iY));
+                    } else if (menaces[0].col == roi.col) {
+                        // Déplacement vertical
+                        sbyte increment = (sbyte)(menaces[0].ligne > roi.ligne ? -1 : 1);
+                        for (byte ligne = (byte)(menaces[0].ligne + increment); ligne != roi.ligne; ligne = (byte)(ligne + increment))
+                            if (Interposer(ligne, menaces[0].col))
+                                return false;
 
+                    } else {
+                        // Déplacement diagonal
+                        sbyte incrementLi = (sbyte)(menaces[0].ligne > roi.ligne ? -1 : 1);
+                        sbyte incrementCol = (sbyte)(menaces[0].col > roi.col ? -1 : 1);
+                        byte col = (byte)(menaces[0].col + incrementCol);
+                        for (byte ligne = (byte)(menaces[0].ligne + incrementLi); ligne != roi.ligne; ligne = (byte)(ligne + incrementLi))
+                            if (Interposer(ligne, col))
+                                return false;
+                            else
+                                col = (byte)(col + incrementCol);
+                    }
+                }
+            }
 
-        } 
+            // Tente de bouger le roi sans se mettre en échec
+            if ((roi.ligne + 1 < 8 && Menaces(((byte)(roi.ligne + 1), roi.col), echiquier).Count > 0) ||
+                (roi.ligne - 1 > 0 && Menaces(((byte)(roi.ligne - 1), roi.col), echiquier).Count > 0) ||
+                (roi.col + 1 < 8 && Menaces((roi.ligne, (byte)(roi.col + 1)), echiquier).Count > 0) ||
+                (roi.col - 1 > 0 && Menaces((roi.ligne, (byte)(roi.col - 1)), echiquier).Count > 0) ||
+                (roi.col + 1 < 8 && roi.ligne - 1 > 0 && Menaces(((byte)(roi.ligne - 1), (byte)(roi.col + 1)), echiquier).Count > 0) ||
+                (roi.col + 1 < 8 && roi.ligne + 1 < 8 && Menaces(((byte)(roi.ligne + 1), (byte)(roi.col + 1)), echiquier).Count > 0) ||
+                (roi.col - 1 > 0 && roi.ligne + 1 < 8 && Menaces(((byte)(roi.ligne + 1), (byte)(roi.col - 1)), echiquier).Count > 0) ||
+                (roi.col - 1 > 0 && roi.ligne - 1 > 0 && Menaces(((byte)(roi.ligne - 1), (byte)(roi.col - 1)), echiquier).Count > 0))
+                return false;
+
+            return true;
+        }
 
         /// <summary>Évalue si le joueur actif est en situation de pat</summary>
         /// <returns>Retourne true si le joueur actif est en situation de pat</returns>
         private bool Pat() {
+            /*(byte ligne, byte col) roi = echiquier.PositionRoi(actif);
+          
+                    if(Menaces(roi,echiquier).Count ==0 && echiquier.CouleurPiece(roi.ligne, roi.col) == actif) {
+  for (int ligne = 0; ligne < 8; ligne++) {
+                for(int col = 0; col < 8; col++) {
+
+                    }
+                }
+            }*/
             throw new NotImplementedException();
+        }
+
+        #endregion
+
+        #region Vérifications divers
+
+        /// <summary>Évalue si la ligne et colonne précisée contient une pièce possédée par le joueur actif.</summary>
+        /// <param name="ligne">Indice de la ligne</param>
+        /// <param name="col">Indice de la colonne</param>
+        /// <returns>Retourne true si le joueur possède une pièce à cet emplacement</returns>
+        private bool PossedePiece(byte ligne, byte col) => !echiquier.EstVide(ligne, col) && echiquier.CouleurPiece(ligne, col) == actif;
+
+        /// <summary>Évalue si le joueur actif possède une pièce pouvant s'interposer à la ligne et colonne précisée</summary>
+        /// <param name="liDest">Indice de la ligne de destination</param>
+        /// <param name="colDest">Indice de la colonne de destination</param>
+        /// <returns>Retourne true si le déplacement d'une pièce à cet emplacement est possible</returns>
+        private bool Interposer(byte liDest, byte colDest) {
+            for (byte ligne = 0; ligne < 8; ligne++)
+                for (byte col = 0; col < 8; col++)
+                    if (PossedePiece(ligne, col) && echiquier.SiDeplacer(ligne, liDest, col, colDest) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, liDest, col, colDest)))
+                        return true;
+
+            return false;
         }
 
         #endregion

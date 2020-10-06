@@ -24,7 +24,7 @@ namespace Echec {
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement du pion pour manger la destination est possible</returns>
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"/></remarks>
-        public override bool SiManger(byte liSrc, byte liDest, byte colSrc, byte colDest) => Couleur == Couleur.BLANC && Math.Abs(liDest - liSrc) == 1 ? colDest - colSrc == -1 : colDest - colSrc == 1;
+        public override bool SiManger(byte liSrc, byte liDest, byte colSrc, byte colDest) => Math.Abs(colDest - colSrc) == 1 && (Couleur == Couleur.BLANC ? liDest - liSrc == -1 : liDest - liSrc == 1);
  
     }
 }

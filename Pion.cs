@@ -16,7 +16,6 @@ namespace Echec {
         /// <remarks>Cette méthode ne tient pas compte des autres pièces possiblement présentes sur l'<see cref="Echiquier"></see></remarks>
         public override bool SiDeplacer(byte liSrc, byte liDest, byte colSrc, byte colDest) => colSrc == colDest && (Init ? Couleur == Couleur.BLANC ? liDest - liSrc == -1 || liDest - liSrc == -2 : liDest - liSrc == 1 || liDest - liSrc == 2 : Couleur == Couleur.BLANC ? liDest - liSrc == -1 : liDest - liSrc == 1);
 
-
         /// <summary>Évalue si le déplacement du pion de la source pour manger celle de la destination est possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
         /// <param name="liDest">Indice de la ligne de destination</param>

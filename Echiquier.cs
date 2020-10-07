@@ -110,7 +110,7 @@ namespace Echec {
                 sbyte incrementLi = (sbyte)(liSrc > liDest ? -1 : 1);
                 sbyte incrementCol = (sbyte)(colSrc > colDest ? -1 : 1);
                 byte col = (byte)(colSrc + incrementCol);
-                for (byte ligne = (byte)(liSrc + incrementLi); ligne != liDest; ligne = (byte)(ligne + incrementLi))
+                for (byte ligne = (byte)(liSrc + incrementLi); ligne != liDest && col != colDest; ligne = (byte)(ligne + incrementLi))
                     if (plateau[ligne, col] != null)
                         return false;
                     else

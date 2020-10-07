@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Runtime.Remoting.Messaging;
 
 namespace Echec {
     /// <summary>Classe de la pièce du fou au jeu d'échec</summary>

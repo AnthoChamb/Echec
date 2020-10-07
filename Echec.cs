@@ -31,7 +31,7 @@ namespace Echec {
         /// <param name="blanc">Indice du joueur des pièces blanches</param>
         public void LancerPartie(int noir, int blanc) {
             formEchec.Hide();
-            new Partie(this, joueurs[noir], joueurs[blanc]).Demarrer();
+            new Partie(joueurs[noir], joueurs[blanc]).Demarrer();
             formEchec.AfficherJoueurs(TabJoueurs);
             formEchec.Show();
         }

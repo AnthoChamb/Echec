@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Echec {
@@ -26,6 +20,9 @@ namespace Echec {
                 ctrl.Click += case_Click;
         }
 
+        /// <summary>Obtient et définit le message dans la zone de texte</summary>
+        public string Message { get => labelMessage.Text; set => labelMessage.Text = value; }
+
         #region Méthodes publiques
 
         /// <summary>Mets à jour l'affichage de l'<see cref="Echiquier"/> dans le formulaire</summary>
@@ -36,18 +33,14 @@ namespace Echec {
                 tableEchiquier.Controls[ctrl++].Text = echiquier[piece].ToString();
         }
 
-        /// <summary>Affiche le message précisé dans la zone de texte</summary>
-        /// <param name="message">Message a afficher</param>
-        public void AfficherMessage(string message) => labelMessage.Text = message;
-
         /// <summary>Affiche une boîte de dialogue aux utilisateurs</summary>
         /// <param name="message">Message de la boîte de dialogue</param>
         /// <param name="titre">Titre de la boîte de dialogue</param>
-        /// <param name="bouttons">Bouttons de la boîte de dialogue</param>
+        /// <param name="boutons">Boutons de la boîte de dialogue</param>
         /// <param name="icone">Icone de le boîte de dialogue</param>
         /// <returns>Retourne la réponse du dialogue</returns>
         /// <remarks>Il est important de délégué à la vue l'appel de boîtes de dialogue afin de respecter le modèle MVC</remarks>
-        public static DialogResult AfficherBoiteDialogue(string message, string titre, MessageBoxButtons bouttons = MessageBoxButtons.OK, MessageBoxIcon icone = MessageBoxIcon.Information) => MessageBox.Show(message, titre, bouttons, icone);
+        public static DialogResult AfficherBoiteDialogue(string message, string titre, MessageBoxButtons boutons = MessageBoxButtons.OK, MessageBoxIcon icone = MessageBoxIcon.Information) => MessageBox.Show(message, titre, boutons, icone);
 
         #endregion
 

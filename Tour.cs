@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Echec {
+﻿namespace Echec {
     /// <summary>Classe de la pièce de la tour au jeu d'échec</summary>
     public class Tour : PieceInit {
         /// <summary>Crée une pièce de tour au jeu d'échec de la couleur spécifié</summary>

@@ -50,13 +50,15 @@ namespace Echec {
         /// <param name="a">Joueur a</param>
         /// <param name="b">Joueur b</param>
         /// <returns>Retourne le pointage du joueur a après une victoire face au joueur b</returns>
-        public static int operator +(Joueur a, Joueur b) => a.Pointage + (a.Pointage - b.Pointage > 500 ? 0 : Math.Abs(a.Pointage - b.Pointage) / a.Pointage < b.Pointage ? 2 : 4);
+        /// <remarks>Le système de pointage de l'énoncé a été modifié pour octroyer un minimum de 2 points lorsque la différence entre les deux joueurs est nulle</remarks>
+        public static int operator +(Joueur a, Joueur b) => a.Pointage + (a.Pointage - b.Pointage > 500 ? 0 : Math.Max(2, Math.Abs(a.Pointage - b.Pointage) / (a.Pointage < b.Pointage ? 2 : 4)));
 
         /// <summary>Obtient le pointage du joueur a après une défaite face au joueur b</summary>
         /// <param name="a">Joueur a</param>
         /// <param name="b">Joueur b</param>
         /// <returns>Retourne le pointage du joueur a après une défaite face au joueur b</returns>
-        public static int operator -(Joueur a, Joueur b) => a.Pointage - (Math.Abs(a.Pointage - b.Pointage) / a.Pointage > b.Pointage ? 2 : 4);
+        /// /// <remarks>Le système de pointage de l'énoncé a été modifié pour enlever un minimum de 2 points lorsque la différence entre les deux joueurs est nulle</remarks>
+        public static int operator -(Joueur a, Joueur b) => a.Pointage - Math.Max(2, Math.Abs(a.Pointage - b.Pointage) / (a.Pointage > b.Pointage ? 2 : 4));
 
         /// <summary>Obtient une représentation en chaine du joueur</summary>
         /// <returns>Retourne une représentation en chaine du joueur</returns>

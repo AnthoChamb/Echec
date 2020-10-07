@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Windows.Forms;
 
 namespace Echec {
     /// <summary>Classe du plateau d'échec (échiquier)</summary>
     public class Echiquier : ICloneable {
         private readonly Piece[,] plateau;
 
-        /// <summary>Crée un nouveau échiquier avec toutes les pièces à leur position initial</summary>
-        public Echiquier() {
-            plateau = new Piece[8, 8];
+        /// <summary>Crée un nouveau échiquier vide</summary>
+        public Echiquier() => plateau = new Piece[8, 8];
 
+        /// <summary>Initialise tous les pièces de l'échiquier.</summary>
+        public void InitialisationPieces() {
             // Initialisation des pièces noires
             plateau[0, 0] = new Tour(Couleur.NOIR);
             plateau[0, 1] = new Cavalier(Couleur.NOIR);
@@ -38,6 +38,8 @@ namespace Echec {
             plateau[7, 7] = new Tour(Couleur.BLANC);
         }
 
+        #region Évaluation des propriétés des pièces
+
         /// <summary>Évalue si la case de l'échiquier est vide</summary>
         /// <param name="ligne">Indice de la ligne</param>
         /// <param name="col">Indice de la colonne</param>
@@ -56,6 +58,10 @@ namespace Echec {
         /// <returns>Retourne la couleur de la pièce</returns>
         public Couleur CouleurPiece(byte ligne, byte col) => plateau[ligne, col].Couleur;
 
+        #endregion
+
+        #region Évaluation des déplacements possibles des pièces
+
         /// <summary>Évalue si le déplacement de la source à la destination est possible</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
         /// <param name="liDest">Indice de la ligne de destination</param>
@@ -72,6 +78,10 @@ namespace Echec {
         /// <returns>Retourne true si le déplacement de la source pour manger la destination est possible</returns>
         public bool SiManger(byte liSrc, byte liDest, byte colSrc, byte colDest) => plateau[liSrc, colSrc].SiManger(liSrc, liDest, colSrc, colDest);
 
+        #endregion
+
+        #region Évaluatoin des types de pièces importants
+
         /// <summary>Obtient si la pièce à la ligne et colonne précisée est un pion</summary>
         /// <param name="ligne">Indice de la ligne</param>
         /// <param name="col">Indice de la colonne</param>
@@ -83,6 +93,23 @@ namespace Echec {
         /// <param name="col">Indice de la colonne</param>
         /// <returns>Retourne true si la pièce est un roi</returns>
         public bool EstRoi(byte ligne, byte col) => plateau[ligne, col] is Roi;
+
+        /// <summary>Obtient la position  du roi en x et en y </summary>
+        /// <param name="couleur">Couleur recherchée</param>
+        /// <returns>Retourne un couple de ligne et de colonne de l'emplacement du roi</returns>
+        /// <exception cref="ArgumentException">La couleur doit toujours possédé son roi</exception>
+        public (byte ligne, byte col) PositionRoi(Couleur couleur) {
+            for (byte ligne = 0; ligne < 8; ligne++)
+                for (byte col = 0; col < 8; col++)
+                    if (EstRoi(ligne, col) && CouleurPiece(ligne, col) == couleur)
+                        return (ligne, col);
+
+            throw new ArgumentException("La couleur ne possède plus de roi");
+        }
+
+        #endregion
+
+        #region Évaluation des déplacements
 
         /// <summary>Évalue si le chemin est libre entre la source et la destination</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
@@ -136,6 +163,10 @@ namespace Echec {
         /// <returns></returns>
         private bool SiPieceRoquable(PieceInit piece, Couleur couleur) => piece.Couleur == couleur && piece.Init;
 
+        #endregion
+
+        #region Jouer des coups
+
         /// <summary>Joue le coup de la source à la destination</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
         /// <param name="liDest">Indice de la ligne de destination</param>
@@ -177,6 +208,8 @@ namespace Echec {
         /// <param name="promotion">Type de la promotion en chaine</param>
         public void Promotion(byte ligne, byte col, string promotion) => plateau[ligne, col] = (Piece)Type.GetType("Echec." + promotion).GetConstructors()[0].Invoke(new object[] { plateau[ligne, col].Couleur });
 
+        #endregion
+
         /// <summary>Obtient une représentation en chaine de l'échiquier</summary>
         /// <returns>Retourne une représentation en chaine de l'échiquier</returns>
         public override string ToString() {
@@ -186,20 +219,6 @@ namespace Echec {
             return echiquier;
         }
 
-        /// <summary>Obtient la position  du roi en x et en y </summary>
-        /// <param name="couleur">Couleur active</param>
-        /// <returns>Retourne la postion en x et en y du roi</returns>
-        public (byte y, byte x) PositionRoi(Couleur couleur) {
-            for (byte i = 0; i < 8; i++) {
-                for (byte j = 0; j < 8; j++) {
-                    if (EstRoi(i, j) && CouleurPiece(i, j) == couleur) {
-                        return (i, j);
-                    }
-                }
-            }
-            return (0, 0);
-        }
-
         /// <summary>Crée une copie de l'instance actuelle</summary>
         /// <returns>Retourne un nouveau objet qui est une copie de l'instance actuelle</returns>
         public object Clone() {
@@ -207,7 +226,7 @@ namespace Echec {
 
             for (int ligne = 0; ligne < plateau.GetLength(0); ligne++)
                 for (int col = 0; col < plateau.GetLength(1); col++)
-                    clone.plateau[ligne, col] = plateau[ligne, col];
+                    clone.plateau[ligne, col] = (Piece)plateau[ligne, col]?.Clone() ?? null;
 
             return clone;
         }

@@ -23,6 +23,7 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormEchec));
             this.groupStats = new System.Windows.Forms.GroupBox();
             this.labStats = new System.Windows.Forms.Label();
             this.btnJouer = new System.Windows.Forms.Button();
@@ -86,6 +87,7 @@
             this.Controls.Add(this.lsvJoueurs);
             this.Controls.Add(this.btnJouer);
             this.Controls.Add(this.groupStats);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(334, 181);
             this.Name = "FormEchec";
             this.Text = "Menu principal";

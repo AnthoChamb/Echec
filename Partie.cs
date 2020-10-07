@@ -7,7 +7,6 @@ namespace Echec {
     /// <summary>Classe d'une partie du jeu d'échec</summary>
     public class Partie {
         private readonly Dictionary<Couleur, Joueur> joueurs;
-        private readonly Echec echec;
         private readonly FormPartie formPartie;
         private readonly Echiquier echiquier;
         private Couleur actif;
@@ -15,19 +14,17 @@ namespace Echec {
         private readonly List<string> posistions;
 
         /// <summary>Crée une partie d'échec</summary>
-        /// <param name="echec">Jeu d'échec lié à cette partie</param>
         /// <param name="noir">Joueur avec les pièces noires</param>
         /// <param name="blanc">Joueur avec les pièces blanches</param>
-        public Partie(Echec echec, Joueur noir, Joueur blanc) {
+        public Partie(Joueur noir, Joueur blanc) {
             joueurs = new Dictionary<Couleur, Joueur> {
                 { Couleur.NOIR, noir },
                 { Couleur.BLANC, blanc }
             };
 
-            this.echec = echec;
             echiquier = new Echiquier();
+            echiquier.InitialisationPieces();
             formPartie = new FormPartie(this);
-            formPartie.AfficherEchiquier(echiquier.ToString());
 
             actif = Couleur.NOIR;
             coups = 0;
@@ -39,10 +36,17 @@ namespace Echec {
         #region Déroulement de la parie
 
         /// <summary>Affiche <see cref="FormPartie"/></summary>
-        public void Demarrer() => formPartie.ShowDialog();
+        public void Demarrer() {
+            formPartie.AfficherEchiquier(echiquier.ToString());
+            formPartie.Message = "C'est à " + joueurs[actif].Nom + " de jouer";
+            formPartie.ShowDialog();
+        }
 
         /// <summary>Capitulation du joueur actif</summary>
-        public void Capituler() => Victoire((Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif));
+        public void Capituler() {
+            formPartie.Message = "Abandon de " + joueurs[actif].Nom;
+            Victoire((Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif));
+        }
 
         /// <summary>Effectue la fin de la parite par la victoire d'un joueur</summary>
         /// <param name="vainqueur">Couleur du joueur vainqueur</param>
@@ -94,7 +98,7 @@ namespace Echec {
                 clone.JouerRoque(actif, colDest == 2);
 
                 if (Menaces(clone.PositionRoi(actif), clone).Count > 0)
-                    formPartie.AfficherMessage("Coup illégal. Votre roi se retrouverait en échec");
+                    formPartie.Message = "Coup illégal. Votre roi se retrouverait en échec";
                 else {
                     echiquier.JouerRoque(actif, colDest == 2);
                     ApresCoup(liDest, colDest);
@@ -106,7 +110,7 @@ namespace Echec {
                 clone.JouerEnPassant(liSrc, liDest, colSrc, colDest);
 
                 if (Menaces(clone.PositionRoi(actif), clone).Count > 0)
-                    formPartie.AfficherMessage("Coup illégal. Votre roi se retrouverait en échec");
+                    formPartie.Message = "Coup illégal. Votre roi se retrouverait en échec";
                 else {
                     echiquier.JouerEnPassant(liSrc, liDest, colSrc, colDest);
                     ApresCoup(liDest, colDest);
@@ -122,7 +126,7 @@ namespace Echec {
             formPartie.AfficherEchiquier(echiquier.ToString());
 
             actif = (Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif); // Truc de Patrick pour inverser
-            formPartie.AfficherMessage("C'est à " + joueurs[actif].Nom + " de jouer");
+            formPartie.Message = "C'est à " + joueurs[actif].Nom + " de jouer";
 
             // Règle des 50 coups
             if (echiquier.EstPion(liDest, colDest) || posistions.Last()[liDest * 8 + colDest] != ' ')
@@ -143,16 +147,22 @@ namespace Echec {
             // Échec et mat
             List<(byte, byte)> menaces = Menaces(echiquier.PositionRoi(actif), echiquier);
             if (menaces.Count > 0) {
-                if (Mat(menaces))
+                if (Mat(menaces)) {
+                    formPartie.Message = "Échec et mat";
                     Victoire((Couleur)((byte)Couleur.BLANC + (byte)Couleur.NOIR - (byte)actif));
+                } else
+                    formPartie.Message = "Échec. " + formPartie.Message;
+
+            // Pat
             } else if (Pat()) {
+                formPartie.Message = "Pat. " + formPartie.Message;
                 FormPartie.AfficherBoiteDialogue("Partie nulle car le joueur au trait est en situation de pat. Retour au menu principal.", "Partie nulle");
                 formPartie.Close();
             }
 
         }
 
-        /// <summary>Évalue si il est possible de jouer le coup de la source à la destination</summary>
+        /// <summary>Évalue si il est possible de jouer le coup de la source à la destination et avise l'utilisateur des erreurs.</summary>
         /// <param name="liSrc">Indice de la ligne source</param>
         /// <param name="liDest">Indice de la ligne de destination</param>
         /// <param name="colDest">Indice de la colonne source</param>
@@ -160,30 +170,30 @@ namespace Echec {
         /// <returns>Retourne true si le coup est possible</returns>
         private bool CoupValide(byte liSrc, byte liDest, byte colSrc, byte colDest) {
             if (echiquier.EstVide(liSrc, colSrc)) {
-                formPartie.AfficherMessage("Coup invalide. Veuillez sélectioner une pièce source");
+                formPartie.Message = "Coup invalide. Veuillez sélectioner une pièce source";
                 return false;
             } 
 
             if (echiquier.CouleurPiece(liSrc, colSrc) != actif) {
-                formPartie.AfficherMessage("Coup invalide. La pièce source ne vous appartient pas");
+                formPartie.Message = "Coup invalide. La pièce source ne vous appartient pas";
                 return false;
             }
 
             if (!echiquier.EstVide(liDest, colDest)) {
                 if (echiquier.CouleurPiece(liDest, colDest) == actif) {
-                    formPartie.AfficherMessage("Coup invalide. Impossible de manger sa propre pièce");
+                    formPartie.Message = "Coup invalide. Impossible de manger sa propre pièce";
                     return false;
                 } else if (!echiquier.SiManger(liSrc ,liDest, colSrc, colDest)) {
-                    formPartie.AfficherMessage("Coup invalide. Cette pièce ne peut effectuer ce déplacement");
+                    formPartie.Message = "Coup invalide. Cette pièce ne peut effectuer ce déplacement";
                     return false;
                 }
             } else if (!echiquier.SiDeplacer(liSrc, liDest, colSrc, colDest)) {
-                formPartie.AfficherMessage("Coup invalide. Cette pièce ne peut effectuer ce déplacement");
+                formPartie.Message = "Coup invalide. Cette pièce ne peut effectuer ce déplacement";
                 return false;
             }
 
             if (!echiquier.EstFlottante(liSrc, colSrc) && !echiquier.CheminLibre(liSrc, liDest, colSrc, colDest)) {
-                formPartie.AfficherMessage("Coup invalide. Une pièce se trouve dans le chemin de la pièce");
+                formPartie.Message = "Coup invalide. Une pièce se trouve dans le chemin de la pièce";
                 return false;
             }
 
@@ -191,7 +201,7 @@ namespace Echec {
             clone.JouerCoup(liSrc, liDest, colSrc, colDest);
 
             if (Menaces(clone.PositionRoi(actif), clone).Count > 0) {
-                formPartie.AfficherMessage("Coup illégal. Votre roi se retrouverait en échec");
+                formPartie.Message = "Coup illégal. Votre roi se retrouverait en échec";
                 return false;
             }
 
@@ -201,9 +211,6 @@ namespace Echec {
         #endregion
 
         #region Vérifications d'échec
-
-        /// <summary>Évalue si le joueur actif est en échec</summary>
-        private bool Echec { get => Menaces(echiquier.PositionRoi(actif), echiquier).Count > 0; }
 
         /// <summary>Obtient une liste des pièces menaçant le roi du joueur actif se situant à l'emplacement précisé</summary>
         /// <param name="roi">Couple de valeur indiquant l'emplacement du roi</param>
@@ -288,7 +295,6 @@ namespace Echec {
 
                                     if (Menaces(clone.PositionRoi(actif), clone).Count == 0)
                                         return false;
-
                                 }
             return true;
         }

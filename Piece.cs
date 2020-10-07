@@ -2,7 +2,7 @@
 
 namespace Echec {
     /// <summary>Classe d'une pièce d'échec. Cette clase ne peut pas être instanciée</summary>
-    public abstract class Piece {
+    public abstract class Piece : ICloneable {
         private readonly char unicode;
         private readonly Couleur couleur;
         private readonly bool flottante;
@@ -49,5 +49,9 @@ namespace Echec {
         /// <summary>Retourne une chaine qui représente la pièce</summary>
         /// <returns>Retourne une chaine qui représente la pièce</returns>
         public override string ToString() => ((char)(unicode + (int)couleur)).ToString();
+
+        /// <summary>Crée une copie de l'instance actuelle</summary>
+        /// <returns>Retourne un nouveau objet qui est une copie de l'instance actuelle</returns>
+        virtual public object Clone() => MemberwiseClone();
     }
 }

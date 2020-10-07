@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Echec {
+﻿namespace Echec {
     /// <summary>Classe de la pièce de la reine au jeu d'échec</summary>
     public class Reine : Piece {
         /// <summary>Crée une pièce de reine au jeu d'échec de la couleur spécifié</summary>

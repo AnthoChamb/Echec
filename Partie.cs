@@ -221,7 +221,7 @@ namespace Echec {
 
             for (byte ligne = 0; ligne < 8; ligne++)
                 for (byte col = 0; col < 8; col++)
-                    if (!echiq.EstRoi(ligne, col) && !echiq.EstVide(ligne, col) && echiq.CouleurPiece(ligne, col) != actif && echiq.SiManger(ligne, roi.ligne, col, roi.col) && (echiq.EstFlottante(ligne, col) || echiq.CheminLibre(ligne, roi.ligne, col, roi.col)))
+                    if (!echiq.EstVide(ligne, col) && echiq.CouleurPiece(ligne, col) != actif && echiq.SiManger(ligne, roi.ligne, col, roi.col) && (echiq.EstFlottante(ligne, col) || echiq.CheminLibre(ligne, roi.ligne, col, roi.col)))
                         menaces.Add((ligne, col));
 
             return menaces;

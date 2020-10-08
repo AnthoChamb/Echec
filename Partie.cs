@@ -288,13 +288,14 @@ namespace Echec {
                                 if (echiquier.EstVide(liDest, colDest) ?
                                     echiquier.SiDeplacer(liSrc, liDest, colSrc, colDest) :
                                     echiquier.CouleurPiece(liDest, colDest) != actif && echiquier.SiManger(liSrc, liDest, colSrc, colDest) &&
-                                    (echiquier.EstFlottante(liSrc, colSrc) || echiquier.CheminLibre(liSrc, liDest, colSrc, colDest)))
+                                    (echiquier.EstFlottante(liSrc, colSrc) || echiquier.CheminLibre(liSrc, liDest, colSrc, colDest))) {
 
                                     Echiquier clone = (Echiquier)echiquier.Clone();
                                     clone.JouerCoup(liSrc, liDest, colSrc, colDest);
 
                                     if (Menaces(clone.PositionRoi(actif), clone).Count == 0)
                                         return false;
+                                }
             return true;
         }
 
@@ -323,8 +324,13 @@ namespace Echec {
         private bool Interposer((byte, byte) roi, byte liDest, byte colDest) {
             for (byte ligne = 0; ligne < 8; ligne++)
                 for (byte col = 0; col < 8; col++)
-                    if (PossedePiece(ligne, col) && !echiquier.EstRoi(ligne, col) && echiquier.SiDeplacer(ligne, liDest, col, colDest) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, liDest, col, colDest)) && !CoupEchec(roi, ligne, liDest, col, colDest))
+                    if (PossedePiece(ligne, col) && !echiquier.EstRoi(ligne, col) && echiquier.SiDeplacer(ligne, liDest, col, colDest) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, liDest, col, colDest))) {
+                        Echiquier clone = (Echiquier)echiquier.Clone();
+                        clone.JouerCoup(ligne, liDest, col, colDest);
+
+                        if (Menaces(roi, clone).Count == 0)
                             return true;
+                    }    
 
             return false;
         }

@@ -105,7 +105,7 @@ namespace Echec {
                 }
 
             // Manger en passant
-            } else if (liDest == (actif == Couleur.BLANC ? 2 : 5) && echiquier.EstPion(liSrc, colSrc) && echiquier.SiManger(liSrc, liDest, colSrc, colDest) && posistions.Last()[(actif == Couleur.BLANC ? 1 : 6) * 7 + colDest] != ' ' && echiquier.EstPion((byte)(actif == Couleur.BLANC ? 3 : 4), colDest)) {
+            } else if (liDest == (actif == Couleur.BLANC ? 2 : 5) && echiquier.EstPion(liSrc, colSrc) && echiquier.SiManger(liSrc, liDest, colSrc, colDest) && posistions[posistions.Count - 2][(actif == Couleur.BLANC ? 1 : 6) * 8 + colDest] != ' ' && echiquier.EstPion((byte)(actif == Couleur.BLANC ? 3 : 4), colDest)) {
                 Echiquier clone = (Echiquier)echiquier.Clone();
                 clone.JouerEnPassant(liSrc, liDest, colSrc, colDest);
 
@@ -135,7 +135,7 @@ namespace Echec {
                 FormPartie.AfficherBoiteDialogue("Partie nulle car les 50 derniers coups consécutifs ont été joués par chacun des joueurs sans le mouvement d'aucun pion et sans aucune prise de pièce. Retour au menu principal.", "Partie nulle");
                 formPartie.Close();
             }
-            
+
             posistions.Add(chaine);
 
             // Troisième répétition d'une même position
@@ -213,7 +213,7 @@ namespace Echec {
         #region Vérifications d'échec
 
         /// <summary>Obtient une liste des pièces menaçant le roi du joueur actif se situant à l'emplacement précisé</summary>
-        /// <param name="roi">Couple de valeur indiquant l'emplacement du roi</param>
+        /// <param name="roi">Couple de valeurs indiquant l'emplacement du roi</param>
         /// <param name="echiq"><see cref="Echiquier"/> à évalué</param>
         /// <returns>Retourne une liste des pièces menaçcant le roi se situant èa l'emplacement précisé</returns>
         private List<(byte ligne, byte col)> Menaces((byte ligne, byte col) roi, Echiquier echiq) {
@@ -246,14 +246,14 @@ namespace Echec {
                         // Déplacement horizontal
                         sbyte increment = (sbyte)(menaces[0].col > roi.col ? -1 : 1);
                         for (byte col = (byte)(menaces[0].col + increment); col != roi.col; col = (byte)(col + increment))
-                            if (Interposer(menaces[0].ligne, col))
+                            if (Interposer(roi, menaces[0].ligne, col))
                                 return false;
 
                     } else if (menaces[0].col == roi.col) {
                         // Déplacement vertical
                         sbyte increment = (sbyte)(menaces[0].ligne > roi.ligne ? -1 : 1);
                         for (byte ligne = (byte)(menaces[0].ligne + increment); ligne != roi.ligne; ligne = (byte)(ligne + increment))
-                            if (Interposer(ligne, menaces[0].col))
+                            if (Interposer(roi, ligne, menaces[0].col))
                                 return false;
 
                     } else {
@@ -262,7 +262,7 @@ namespace Echec {
                         sbyte incrementCol = (sbyte)(menaces[0].col > roi.col ? -1 : 1);
                         byte col = (byte)(menaces[0].col + incrementCol);
                         for (byte ligne = (byte)(menaces[0].ligne + incrementLi); ligne != roi.ligne && col != roi.col; ligne = (byte)(ligne + incrementLi))
-                            if (Interposer(ligne, col))
+                            if (Interposer(roi, ligne, col))
                                 return false;
                             else
                                 col = (byte)(col + incrementCol);
@@ -288,14 +288,13 @@ namespace Echec {
                                 if (echiquier.EstVide(liDest, colDest) ?
                                     echiquier.SiDeplacer(liSrc, liDest, colSrc, colDest) :
                                     echiquier.CouleurPiece(liDest, colDest) != actif && echiquier.SiManger(liSrc, liDest, colSrc, colDest) &&
-                                    echiquier.EstFlottante(liSrc, colSrc) || echiquier.CheminLibre(liSrc, liDest, colSrc, colDest)) {
+                                    (echiquier.EstFlottante(liSrc, colSrc) || echiquier.CheminLibre(liSrc, liDest, colSrc, colDest)))
 
                                     Echiquier clone = (Echiquier)echiquier.Clone();
                                     clone.JouerCoup(liSrc, liDest, colSrc, colDest);
 
                                     if (Menaces(clone.PositionRoi(actif), clone).Count == 0)
                                         return false;
-                                }
             return true;
         }
 
@@ -317,14 +316,15 @@ namespace Echec {
         private bool BougerRoi((byte ligne, byte col) roi, sbyte ligne, sbyte col) => roi.ligne + ligne >= 0 && roi.ligne + ligne < 8 && roi.col + col >= 0 && roi.col + col < 8 && (echiquier.EstVide((byte)(roi.ligne + ligne), (byte)(roi.col + col)) || echiquier.CouleurPiece((byte)(roi.ligne + ligne), (byte)(roi.col + col)) != actif) && Menaces(((byte)(roi.ligne + ligne), (byte)(roi.col + col)), echiquier).Count == 0;
 
         /// <summary>Évalue si le joueur actif possède une pièce pouvant s'interposer à la ligne et colonne précisée</summary>
+        /// <param name="roi">Couple de valeur indiquant l'emplacement du roi</param>
         /// <param name="liDest">Indice de la ligne de destination</param>
         /// <param name="colDest">Indice de la colonne de destination</param>
         /// <returns>Retourne true si le déplacement d'une pièce à cet emplacement est possible</returns>
-        private bool Interposer(byte liDest, byte colDest) {
+        private bool Interposer((byte, byte) roi, byte liDest, byte colDest) {
             for (byte ligne = 0; ligne < 8; ligne++)
                 for (byte col = 0; col < 8; col++)
-                    if (PossedePiece(ligne, col) && !echiquier.EstRoi(ligne, col) && echiquier.SiDeplacer(ligne, liDest, col, colDest) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, liDest, col, colDest)))
-                        return true;
+                    if (PossedePiece(ligne, col) && !echiquier.EstRoi(ligne, col) && echiquier.SiDeplacer(ligne, liDest, col, colDest) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, liDest, col, colDest)) && !CoupEchec(roi, ligne, liDest, col, colDest))
+                            return true;
 
             return false;
         }

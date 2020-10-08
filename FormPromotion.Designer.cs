@@ -104,6 +104,7 @@
             this.MinimumSize = new System.Drawing.Size(230, 199);
             this.Name = "FormPromotion";
             this.Text = "Promotion";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormPromotion_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

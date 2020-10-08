@@ -50,7 +50,11 @@ namespace Echec {
         /// <summary>Gestionnaire d'événement d'un clic du boutton jouer</summary>
         /// <param name="sender">Objet à l'origine de de l'événement</param>
         /// <param name="e">Paramètres de l'événement</param>
-        private void btnJouer_Click(object sender, EventArgs e) => echec.LancerPartie(lsvJoueurs.SelectedIndices[0], lsvJoueurs.SelectedIndices[1]);
+        private void btnJouer_Click(object sender, EventArgs e) {
+            echec.LancerPartie(lsvJoueurs.SelectedIndices[0], lsvJoueurs.SelectedIndices[1]);
+            lsvJoueurs.SelectedItems.Clear();
+            lsvJoueurs_SelectedIndexChanged(sender, e);
+        }
 
         #endregion
     }

@@ -94,14 +94,14 @@ namespace Echec {
         /// <returns>Retourne true si la pièce est un roi</returns>
         public bool EstRoi(byte ligne, byte col) => plateau[ligne, col] is Roi;
 
-        /// <summary>Obtient la position  du roi en x et en y </summary>
+        /// <summary>Obtient la position  du roi de la couleur précisée</summary>
         /// <param name="couleur">Couleur recherchée</param>
         /// <returns>Retourne un couple de ligne et de colonne de l'emplacement du roi</returns>
         /// <exception cref="ArgumentException">La couleur doit toujours possédé son roi</exception>
         public (byte ligne, byte col) PositionRoi(Couleur couleur) {
             for (byte ligne = 0; ligne < 8; ligne++)
                 for (byte col = 0; col < 8; col++)
-                    if (EstRoi(ligne, col) && CouleurPiece(ligne, col) == couleur)
+                    if (plateau[ligne, col] is Roi && plateau[ligne, col].Couleur == couleur)
                         return (ligne, col);
 
             throw new ArgumentException("La couleur ne possède plus de roi");
@@ -224,8 +224,8 @@ namespace Echec {
         public object Clone() {
             Echiquier clone = new Echiquier();
 
-            for (int ligne = 0; ligne < plateau.GetLength(0); ligne++)
-                for (int col = 0; col < plateau.GetLength(1); col++)
+            for (int ligne = 0; ligne < 8; ligne++)
+                for (int col = 0; col < 8; col++)
                     clone.plateau[ligne, col] = (Piece)plateau[ligne, col]?.Clone() ?? null;
 
             return clone;

@@ -237,8 +237,14 @@ namespace Echec {
                 // Tente de capturer la pièce menaçante
                 for (byte ligne = 0; ligne < 8; ligne++)
                     for (byte col = 0; col < 8; col++)
-                        if (PossedePiece(ligne, col) && echiquier.SiManger(ligne, menaces[0].ligne, col, menaces[0].col) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, menaces[0].ligne, col, menaces[0].col)))
-                            return false;
+                        if (PossedePiece(ligne, col) && echiquier.SiManger(ligne, menaces[0].ligne, col, menaces[0].col) && (echiquier.EstFlottante(ligne, col) || echiquier.CheminLibre(ligne, menaces[0].ligne, col, menaces[0].col))) {
+                            Echiquier clone = (Echiquier)echiquier.Clone();
+                            clone.JouerCoup(ligne, menaces[0].ligne, col, menaces[0].col);
+
+                            if (Menaces(clone.PositionRoi(actif), clone).Count == 0)
+                                return false;
+                        }
+                            
 
                 // Tente d'interposer une pièce entre le roi et la pièce menaçante
                 if (!echiquier.EstFlottante(menaces[0].ligne, menaces[0].col)) {
